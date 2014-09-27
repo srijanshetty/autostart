@@ -1,0 +1,29 @@
+#!/usr/bin/python
+import subprocess, configparser, argparse
+
+config = configparser.ConfigParser()
+config.read('/home/srijan/.autostartrc')
+
+def kill():
+    for sec in config.sections():
+        try:
+            subprocess.check_call(['pkill', config[sec]['name']])
+        except subprocess.CalledProcessError:
+            print '%s failed to terminate' %config[sec]['name']
+
+def start():
+    for sec in config.sections():
+        try:
+            subprocess.check_call(['./run.sh', config[sec]['name'], config[sec]['path']])
+        except subprocess.CalledProcessError:
+            print '%s failed to start' %config[sec]['name']
+
+# Parse arguments
+parser = argparse.ArgumentParser(description='Program to batch start and stop programs')
+parser.add_argument('action', help='KILL or START a program', default='start')
+args = vars(parser.parse_args())
+
+if args['action'] == 'kill':
+    kill()
+else:
+    start()
