@@ -11,10 +11,17 @@ def kill():
         except subprocess.CalledProcessError:
             print '%s failed to terminate' %config[sec]['name']
 
+def status():
+    for sec in config.sections():
+        try:
+            subprocess.check_call(['pkill', config[sec]['name']])
+        except subprocess.CalledProcessError:
+            print '%s is not running' %config[sec]['name']
+
 def start():
     for sec in config.sections():
         try:
-            subprocess.check_call(['./run.sh', config[sec]['name'], config[sec]['path']])
+            subprocess.check_call(['run.sh', config[sec]['name'], config[sec]['path']])
         except subprocess.CalledProcessError:
             print '%s failed to start' %config[sec]['name']
 
@@ -23,7 +30,9 @@ parser = argparse.ArgumentParser(description='Program to batch start and stop pr
 parser.add_argument('action', help='KILL or START a program', default='start')
 args = vars(parser.parse_args())
 
-if args['action'] == 'kill':
+if args['action'] == 'stop':
     kill()
+elif args['action'] == 'status':
+    status()
 else:
     start()
